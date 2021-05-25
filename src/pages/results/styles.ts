@@ -98,3 +98,28 @@ export const Movies = styled.div`
     }
   }
 `;
+
+export const Pagination = styled.div`
+  display: flex;
+  justify-content: center;
+  margin: 30px 0 30px 0;
+`;
+
+export const PaginationButton = styled.div`
+  display: flex;
+  cursor: pointer;
+`;
+
+export const PaginationItem = styled.button`
+  background-color: transparent;
+  border-color: grey;
+  border: none;
+  margin: 0 10px;
+`;
+
+export const PaginationTeste = styled.button`
+  background-color: transparent;
+  border-color: grey;
+  border: none;
+  margin: 0 10px;
+`;
