@@ -32,6 +32,7 @@ const Results = (props: IMovie) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [hitFive, setHitFive] = useState<number[]>([]);
   const [selectedPage, setSelectedPage] = useState<number>(0);
+  const [loadingMovies, setLoadingMovies] = useState<boolean>(false);
 
   const useQuery = useCallback(function useQuery() {
     return new URLSearchParams(useLocation().search);
@@ -42,6 +43,8 @@ const Results = (props: IMovie) => {
 
   const handleGetMovies = useCallback(async () => {
     console.log(currentPage);
+
+    setLoadingMovies(true);
 
     const { data } = await api.get(
       `/${query}&page=${currentPage}&limit=${limit}`,
@@ -64,8 +67,6 @@ const Results = (props: IMovie) => {
       pageNumber => pageNumber >= 1 && pageNumber < totalPages,
     );
 
-    console.log(result);
-
     for (let i = 1; i <= totalPages; i++) {
       arrayPages.push(i);
     }
@@ -75,6 +76,7 @@ const Results = (props: IMovie) => {
     setHitFive(result);
 
     setMovies(data.Search);
+    setLoadingMovies(false);
   }, [currentPage, limit, query]);
 
   useEffect(() => {
@@ -92,19 +94,20 @@ const Results = (props: IMovie) => {
   }, []);
 
   console.log('pages.length', pages.length);
+  console.log('movies.length', movies?.length);
 
   return (
     <>
       <Header />
 
       <S.Movies onChange={limits}>
-        {movies?.length ? (
+        {loadingMovies && <h1>Carregando...</h1>}
+        {!loadingMovies &&
+          movies?.length > 0 &&
           movies?.map(eachMovie => (
             <Card key={eachMovie.imdbID} movie={eachMovie} />
-          ))
-        ) : (
-          <h1>carregando...</h1>
-        )}
+          ))}
+        {!loadingMovies && !movies?.length && <h1>Nenhum filme encontrado!</h1>}
       </S.Movies>
       <S.Pagination>
         <S.PaginationButton>
