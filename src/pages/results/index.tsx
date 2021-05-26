@@ -27,10 +27,10 @@ interface IMoviesResults {
 const Results = (props: IMovie) => {
   const [movies, setMovies] = useState<IMovie[]>([]);
   const [total, setTotal] = useState(0);
-  const [limit, setLimit] = useState(5);
+  const [limit, setLimit] = useState(10);
   const [pages, setPages] = useState<number[]>([] as number[]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [hitFive, setHitFive] = useState<number[]>([] as number[]);
+  const [hitFive, setHitFive] = useState<number[]>([]);
   const [selectedPage, setSelectedPage] = useState<number>(0);
 
   const useQuery = useCallback(function useQuery() {
@@ -49,12 +49,22 @@ const Results = (props: IMovie) => {
 
     setTotal(data.totalResults);
 
-    const totalPages =
-      total % 10 ? Math.floor(total / 10) + 1 : Math.floor(total / 10);
-
-    setLimit(totalPages);
+    const totalPages = Math.ceil(data.totalResults / limit);
 
     const arrayPages = [] as number[];
+
+    let result = [];
+    let intervalNumber = currentPage - 3;
+    while (intervalNumber < currentPage + 3) {
+      result.push(intervalNumber);
+      intervalNumber++;
+    }
+
+    result = result.filter(
+      pageNumber => pageNumber >= 1 && pageNumber < totalPages,
+    );
+
+    console.log(result);
 
     for (let i = 1; i <= totalPages; i++) {
       arrayPages.push(i);
@@ -62,16 +72,14 @@ const Results = (props: IMovie) => {
 
     setPages(arrayPages);
 
+    setHitFive(result);
+
     setMovies(data.Search);
-
-    const parsedPages = pages.slice(selectedPage, selectedPage + 5);
-
-    setHitFive(parsedPages as number[]);
   }
 
   useEffect(() => {
     handleGetMovies();
-  }, [currentPage, total, hitFive]);
+  }, [selectedPage, currentPage]);
 
   const handleChangePage = useCallback(page => {
     setSelectedPage(page);
