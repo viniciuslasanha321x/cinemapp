@@ -40,7 +40,7 @@ const Results = (props: IMovie) => {
   const params = useQuery();
   const query = params.get('query');
 
-  async function handleGetMovies() {
+  const handleGetMovies = useCallback(async () => {
     console.log(currentPage);
 
     const { data } = await api.get(
@@ -75,11 +75,11 @@ const Results = (props: IMovie) => {
     setHitFive(result);
 
     setMovies(data.Search);
-  }
+  }, [currentPage, limit, query]);
 
   useEffect(() => {
     handleGetMovies();
-  }, [selectedPage, currentPage]);
+  }, [selectedPage, currentPage, handleGetMovies]);
 
   const handleChangePage = useCallback(page => {
     setSelectedPage(page);
@@ -91,13 +91,17 @@ const Results = (props: IMovie) => {
     setCurrentPage(1);
   }, []);
 
+  console.log('pages.length', pages.length);
+
   return (
     <>
       <Header />
 
       <S.Movies onChange={limits}>
-        {movies.length ? (
-          movies?.map(eachMovie => <Card movie={eachMovie} />)
+        {movies?.length ? (
+          movies?.map(eachMovie => (
+            <Card key={eachMovie.imdbID} movie={eachMovie} />
+          ))
         ) : (
           <h1>carregando...</h1>
         )}
@@ -113,6 +117,7 @@ const Results = (props: IMovie) => {
             <S.PaginationTeste
               key={page}
               onClick={() => handleChangePage(page)}
+              isSelected={page === currentPage}
             >
               {page}
             </S.PaginationTeste>
@@ -123,13 +128,14 @@ const Results = (props: IMovie) => {
           <S.PaginationTeste
             key={pages[pages.length - 1]}
             onClick={() => handleChangePage(pages[pages.length - 1])}
+            isSelected={pages[pages.length - 1] === currentPage}
           >
             {pages[pages.length - 1]}
           </S.PaginationTeste>
 
-          {currentPage < pages.length && (
+          {currentPage <= pages.length && (
             <S.PaginationItem
-              disabled={currentPage === limit}
+              disabled={currentPage === pages.length}
               onClick={() => handleChangePage(currentPage + 1)}
             >
               Next

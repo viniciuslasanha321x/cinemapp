@@ -1,5 +1,13 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { shade } from 'polished';
+
+interface PaginationTesteProps {
+  isSelected?: boolean;
+}
+
+interface PaginationItemProps {
+  disabled?: boolean;
+}
 
 export const Container = styled.div`
   display: flex;
@@ -110,16 +118,32 @@ export const PaginationButton = styled.div`
   cursor: pointer;
 `;
 
-export const PaginationItem = styled.button`
+export const PaginationItem = styled.button<PaginationItemProps>`
   background-color: transparent;
   border-color: grey;
   border: none;
   margin: 0 10px;
+
+  ${({ disabled }) =>
+    disabled &&
+    css`
+      color: grey;
+    `}
 `;
 
-export const PaginationTeste = styled.button`
+export const PaginationTeste = styled.button<PaginationTesteProps>`
   background-color: transparent;
   border-color: grey;
   border: none;
   margin: 0 10px;
+
+  ${({ isSelected }) =>
+    isSelected &&
+    css`
+      background-color: var(--background2);
+      color: #ffff;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+    `}
 `;
