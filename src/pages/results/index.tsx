@@ -42,7 +42,7 @@ const Results = (props: IMovie) => {
   const query = params.get('query');
 
   const handleGetMovies = useCallback(async () => {
-    console.log(currentPage);
+    if (!query) return;
 
     setLoadingMovies(true);
 
@@ -92,9 +92,6 @@ const Results = (props: IMovie) => {
     setLimit(e.target.value);
     setCurrentPage(1);
   }, []);
-
-  console.log('pages.length', pages.length);
-  console.log('movies.length', movies?.length);
 
   return (
     <>
