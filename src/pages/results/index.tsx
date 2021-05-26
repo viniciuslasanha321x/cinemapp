@@ -30,6 +30,8 @@ const Results = (props: IMovie) => {
   const [limit, setLimit] = useState(5);
   const [pages, setPages] = useState<number[]>([] as number[]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [hitFive, setHitFive] = useState<number[]>([] as number[]);
+  const [selectedPage, setSelectedPage] = useState<number>(0);
 
   const useQuery = useCallback(function useQuery() {
     return new URLSearchParams(useLocation().search);
@@ -61,11 +63,20 @@ const Results = (props: IMovie) => {
     setPages(arrayPages);
 
     setMovies(data.Search);
+
+    const parsedPages = pages.slice(selectedPage, selectedPage + 5);
+
+    setHitFive(parsedPages as number[]);
   }
 
   useEffect(() => {
     handleGetMovies();
-  }, [currentPage, total]);
+  }, [currentPage, total, hitFive]);
+
+  const handleChangePage = useCallback(page => {
+    setSelectedPage(page);
+    setCurrentPage(page);
+  }, []);
 
   const limits = useCallback(e => {
     setLimit(e.target.value);
@@ -77,26 +88,41 @@ const Results = (props: IMovie) => {
       <Header />
 
       <S.Movies onChange={limits}>
-        {movies?.map(eachMovie => (
-          <Card movie={eachMovie} />
-        ))}
+        {movies.length ? (
+          movies?.map(eachMovie => <Card movie={eachMovie} />)
+        ) : (
+          <h1>carregando...</h1>
+        )}
       </S.Movies>
       <S.Pagination>
         <S.PaginationButton>
           {currentPage > 1 && (
-            <S.PaginationItem onClick={() => setCurrentPage(currentPage - 1)}>
+            <S.PaginationItem onClick={() => handleChangePage(currentPage - 1)}>
               Previous
             </S.PaginationItem>
           )}
-          {pages.map(page => (
-            <S.PaginationTeste key={page} onClick={() => setCurrentPage(page)}>
+          {hitFive.map(page => (
+            <S.PaginationTeste
+              key={page}
+              onClick={() => handleChangePage(page)}
+            >
               {page}
             </S.PaginationTeste>
           ))}
+
+          <S.PaginationTeste key={pages[pages.length]}>...</S.PaginationTeste>
+
+          <S.PaginationTeste
+            key={pages[pages.length - 1]}
+            onClick={() => handleChangePage(pages[pages.length - 1])}
+          >
+            {pages[pages.length - 1]}
+          </S.PaginationTeste>
+
           {currentPage < pages.length && (
             <S.PaginationItem
               disabled={currentPage === limit}
-              onClick={() => setCurrentPage(currentPage + 1)}
+              onClick={() => handleChangePage(currentPage + 1)}
             >
               Next
             </S.PaginationItem>
